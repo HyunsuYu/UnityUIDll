@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -25,11 +26,11 @@ namespace UnityUIDll
             public Vector2 mpivot;
             public Vector2 manchor;
 
-            public InputPack(in GameObject targetObject, in Sprite baseSprite, in Vector2 position, in Vector2 pivot, in Vector2 anchor)
+            public InputPack(in GameObject targetObject, in Sprite PopedSprite, in Vector2 position, in Vector2 pivot, in Vector2 anchor)
             {
                 mtargetObject = targetObject;
 
-                mbaseSprite = baseSprite;
+                mbaseSprite = PopedSprite;
 
                 mposition = position;
                 mpivot = pivot;
@@ -59,169 +60,232 @@ namespace UnityUIDll
 
 
         //  propertys
-            //  target GmaeObject
+        //  target GmaeObject
+        [SerializeField]
         private GameObject mtargetObject;
 
-            //  related with button
-        private Button.ButtonClickedEvent mbuttonClickedEvent;
+        //  related with button
+        private Button.ButtonClickedEvent mbuttonClickedEventForShort;
+        private Button.ButtonClickedEvent mbuttonClickedEventForLong;
         private RectTransform mrectTransform;
         private EButtonClickType mbuttonClickType;
         private float mrepeatPeriod;
         private Tuple<UnityAction, UnityAction> mfunctions;
         private bool mbisPushed;
 
-            //  related with button GameObject Image Component
+        //  related with button GameObject Image Component
         private Image mbuttonImage;
+        [SerializeField]
         private Dictionary<EUIButtonSpriteKind, Sprite> mbuttonSpriteTable;
 
-            //  related with button GameObject Animation
+        //  related with button GameObject Animation
         private Animator mbuttonAnimator;
+        [SerializeField]
         private Dictionary<EUIButtonAnimationKind, string> mbuttonAnimationTable;
 
-            //  button state bool variable
+        //  button state bool variable
         private bool mbisEnter;
         private bool mbisClick;
         private bool mbisDown;
-        private bool mbisUp;
-        private bool mbisExit;
 
-            //  using default
+        //  using default
         private bool mbusingDefault;
 
 
 
         //  methods
             //  constructor
-        public UIButton(in InputPack inputPack, in UnityAction shortClickFunction)
+        public void ConstructDefault(in InputPack inputPack, in UnityAction shortClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortClick;
 
             mtargetObject = inputPack.mtargetObject;
 
-            mbuttonClickedEvent = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
             mrectTransform = mtargetObject.AddComponent<RectTransform>() as RectTransform;
-            mrectTransform.position = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrectTransform.pivot = new Vector2(inputPack.mpivot.x, inputPack.mpivot.y);
             mrectTransform.anchorMin = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
             mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
+            mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrepeatPeriod = -1.0f;
             mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, null);
+
+            mbuttonClickedEventForShort.AddListener(shortClickFunction);
 
             mbuttonImage = mtargetObject.AddComponent<Image>();
             mbuttonImage.sprite = inputPack.mbaseSprite;
             mbuttonSpriteTable = new Dictionary<EUIButtonSpriteKind, Sprite>();
+            mbuttonSpriteTable.Add(EUIButtonSpriteKind.Poped, inputPack.mbaseSprite);
 
-            mbuttonAnimator = mtargetObject.AddComponent<Animator>() as Animator;
+            mbuttonAnimator = mtargetObject.AddComponent<Animator>();
             mbuttonAnimationTable = new Dictionary<EUIButtonAnimationKind, string>();
+            mbuttonAnimator.enabled = false;
+
+            usingDefault = true;
         }
-        public UIButton(in InputPack inputPack, float repeatPeriod, in UnityAction longClickFunction)
+        public void ConstructDefault(in InputPack inputPack, float repeatPeriod, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.LongClick;
 
             mtargetObject = inputPack.mtargetObject;
 
-            mbuttonClickedEvent = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
             mrectTransform = mtargetObject.AddComponent<RectTransform>() as RectTransform;
-            mrectTransform.position = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrectTransform.pivot = new Vector2(inputPack.mpivot.x, inputPack.mpivot.y);
             mrectTransform.anchorMin = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
             mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
+            mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrepeatPeriod = repeatPeriod;
             mfunctions = new Tuple<UnityAction, UnityAction>(null, longClickFunction);
+
+            mbuttonClickedEventForLong.AddListener(longClickFunction);
 
             mbuttonImage = mtargetObject.AddComponent<Image>();
             mbuttonImage.sprite = inputPack.mbaseSprite;
             mbuttonSpriteTable = new Dictionary<EUIButtonSpriteKind, Sprite>();
+            mbuttonSpriteTable.Add(EUIButtonSpriteKind.Poped, inputPack.mbaseSprite);
 
-            mbuttonAnimator = mtargetObject.AddComponent<Animator>() as Animator;
+            mbuttonAnimator = mtargetObject.AddComponent<Animator>();
             mbuttonAnimationTable = new Dictionary<EUIButtonAnimationKind, string>();
+            mbuttonAnimator.enabled = false;
+
+            usingDefault = true;
         }
-        public UIButton(in InputPack inputPack, float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
+        public void ConstructDefault(in InputPack inputPack, float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortAndLongClick;
 
             mtargetObject = inputPack.mtargetObject;
 
-            mbuttonClickedEvent = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
             mrectTransform = mtargetObject.AddComponent<RectTransform>() as RectTransform;
-            mrectTransform.position = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrectTransform.pivot = new Vector2(inputPack.mpivot.x, inputPack.mpivot.y);
             mrectTransform.anchorMin = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
             mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
+            mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrepeatPeriod = repeatPeriod;
             mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, longClickFunction);
+
+            mbuttonClickedEventForShort.AddListener(shortClickFunction);
+            mbuttonClickedEventForLong.AddListener(longClickFunction);
 
             mbuttonImage = mtargetObject.AddComponent<Image>();
             mbuttonImage.sprite = inputPack.mbaseSprite;
             mbuttonSpriteTable = new Dictionary<EUIButtonSpriteKind, Sprite>();
+            mbuttonSpriteTable.Add(EUIButtonSpriteKind.Poped, inputPack.mbaseSprite);
 
-            mbuttonAnimator = mtargetObject.AddComponent<Animator>() as Animator;
+            mbuttonAnimator = mtargetObject.AddComponent<Animator>();
             mbuttonAnimationTable = new Dictionary<EUIButtonAnimationKind, string>();
+            mbuttonAnimator.enabled = false;
+
+            usingDefault = true;
         }
 
-        //  interface method
+            //  interface method
         public void OnPointerEnter(PointerEventData pointerEventData)
         {
             mbisEnter = true;
-            mbisExit = false;
 
             if (mbusingDefault)
             {
                 if (mbisPushed == true)
                 {
-                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPushed];
+                    if(mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPushed))
+                    {
+                        mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPushed];
+                    }
                 }
                 else
                 {
-                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPoped];
+                    if(mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPoped))
+                    {
+                        mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPoped];
+                    }
                 }
             }
         }
         public void OnPointerClick(PointerEventData pointerEventData)
         {
-            mbisPushed = true;
-
             mbisClick = true;
-            mbisUp = false;
 
-            if(mbusingDefault)
+            if (mbusingDefault)
             {
-                mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Pushed];
-
-                mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.ButtonPushed]);
+                FunctionForShortClick();
             }
         }
         public void OnPointerDown(PointerEventData pointerEventData)
         {
+            if(mbisPushed)
+            {
+                mbisPushed = false;
+            }
+            else
+            {
+                mbisPushed = true;
+            }
             mbisDown = true;
+
+            if (mbusingDefault)
+            {
+                if (mbisPushed && mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPushed))
+                {
+                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPushed];
+                }
+                else if (mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPoped))
+                {
+                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPoped];
+                }
+
+                mbuttonAnimator.enabled = true;
+                if (mbisPushed && mbuttonAnimationTable.ContainsKey(EUIButtonAnimationKind.ButtonPushed))
+                {
+                    mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.ButtonPushed]);
+                    Invoke("SetAnimatorEnableFalse", mbuttonAnimator.GetCurrentAnimatorStateInfo(0).length);
+                }
+                else if(mbuttonAnimationTable.ContainsKey(EUIButtonAnimationKind.Idle))
+                {
+                    mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.Idle]);
+                    Invoke("SetAnimatorEnableFalse", mbuttonAnimator.GetCurrentAnimatorStateInfo(0).length);
+                }
+
+                if (mbuttonClickType == EButtonClickType.LongClick || mbuttonClickType == EButtonClickType.ShortAndLongClick)
+                {
+                    InvokeRepeating("FunctionForLongClick", 0.0f, mrepeatPeriod);
+                }
+            }
         }
         public void OnPointerUp(PointerEventData pointerEventData)
         {
-            mbisPushed = false;
-
-            mbisUp = true;
             mbisClick = false;
             mbisDown = false;
 
-            if(mbusingDefault)
+            if (mbusingDefault)
             {
-                mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.Idle]);
+                CancelInvoke("FunctionForLongClick");
             }
         }
         public void OnPointerExit(PointerEventData pointerEventData)
         {
-            mbisExit = true;
             mbisEnter = false;
 
-            if(mbusingDefault)
+            if (mbusingDefault)
             {
                 if (mbisPushed == true)
                 {
-                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Pushed];
+                    if(mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.Pushed))
+                    {
+                        mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Pushed];
+                    }
                 }
                 else
                 {
-                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Poped];
+                    if(mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.Poped))
+                    {
+                        mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Poped];
+                    }
                 }
             }
         }
@@ -231,9 +295,13 @@ namespace UnityUIDll
         {
             get => mtargetObject;
         }
-        public Button.ButtonClickedEvent buttonClickedEvent
+        public Button.ButtonClickedEvent buttonClickedEventForshort
         {
-            get => mbuttonClickedEvent;
+            get => mbuttonClickedEventForShort;
+        }
+        public Button.ButtonClickedEvent buttonClickedEventForLong
+        {
+            get => mbuttonClickedEventForLong;
         }
         public RectTransform rectTransform
         {
@@ -286,14 +354,6 @@ namespace UnityUIDll
         {
             get => mbisDown;
         }
-        public bool isUp
-        {
-            get => mbisUp;
-        }
-        public bool isExit
-        {
-            get => mbisExit;
-        }
         public bool usingDefault
         {
             get => mbusingDefault;
@@ -322,9 +382,9 @@ namespace UnityUIDll
 
             mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, longClickFunction);
         }
-        public void SetButtonAnimation(string animationStateName, in EUIButtonAnimationKind buttonAnimationKind)
+        public void SetButtonAnimationState(string animationStateName, in EUIButtonAnimationKind buttonAnimationKind)
         {
-            if(mbuttonAnimationTable.ContainsKey(buttonAnimationKind) == true)
+            if (mbuttonAnimationTable.ContainsKey(buttonAnimationKind) == true)
             {
                 mbuttonAnimationTable.Remove(buttonAnimationKind);
                 mbuttonAnimationTable.Add(buttonAnimationKind, animationStateName);
@@ -334,9 +394,13 @@ namespace UnityUIDll
                 mbuttonAnimationTable.Add(buttonAnimationKind, animationStateName);
             }
         }
+        public void SetButtonAnimationController(in RuntimeAnimatorController animatorController)
+        {
+            mbuttonAnimator.runtimeAnimatorController = animatorController;
+        }
         public void SetButtonSprite(in Sprite sprite, in EUIButtonSpriteKind buttonSpriteKind)
         {
-            if(mbuttonSpriteTable.ContainsKey(buttonSpriteKind) == true)
+            if (mbuttonSpriteTable.ContainsKey(buttonSpriteKind) == true)
             {
                 mbuttonSpriteTable.Remove(buttonSpriteKind);
                 mbuttonSpriteTable.Add(buttonSpriteKind, sprite);
@@ -344,6 +408,29 @@ namespace UnityUIDll
             else
             {
                 mbuttonSpriteTable.Add(buttonSpriteKind, sprite);
+            }
+        }
+
+            //  private method
+        private void FunctionForShortClick()
+        {
+            mbuttonClickedEventForShort.Invoke();
+        }
+        private void FunctionForLongClick()
+        {
+            mbuttonClickedEventForLong.Invoke();
+        }
+        private void SetAnimatorEnableFalse()
+        {
+            mbuttonAnimator.enabled = false;
+
+            if (mbisPushed && mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPushed))
+            {
+                mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPushed];
+            }
+            else if (mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPoped))
+            {
+                mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPoped];
             }
         }
     }
