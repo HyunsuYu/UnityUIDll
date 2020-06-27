@@ -70,7 +70,6 @@ namespace UnityUIDll
         private RectTransform mrectTransform;
         private EButtonClickType mbuttonClickType;
         private float mrepeatPeriod;
-        private Tuple<UnityAction, UnityAction> mfunctions;
         private bool mbisPushed;
 
         //  related with button GameObject Image Component
@@ -109,7 +108,6 @@ namespace UnityUIDll
             mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
             mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrepeatPeriod = -1.0f;
-            mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, null);
 
             mbuttonClickedEventForShort.AddListener(shortClickFunction);
 
@@ -138,7 +136,6 @@ namespace UnityUIDll
             mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
             mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrepeatPeriod = repeatPeriod;
-            mfunctions = new Tuple<UnityAction, UnityAction>(null, longClickFunction);
 
             mbuttonClickedEventForLong.AddListener(longClickFunction);
 
@@ -167,7 +164,6 @@ namespace UnityUIDll
             mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
             mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
             mrepeatPeriod = repeatPeriod;
-            mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, longClickFunction);
 
             mbuttonClickedEventForShort.AddListener(shortClickFunction);
             mbuttonClickedEventForLong.AddListener(longClickFunction);
@@ -316,11 +312,6 @@ namespace UnityUIDll
             get => mrepeatPeriod;
             set => mrepeatPeriod = value;
         }
-        public Tuple<UnityAction, UnityAction> functions
-        {
-            get => mfunctions;
-            set => mfunctions = value;
-        }
         public bool isPushed
         {
             get => mbisPushed;
@@ -366,21 +357,27 @@ namespace UnityUIDll
             mbuttonClickType = EButtonClickType.ShortClick;
             repeatPeriod = -1.0f;
 
-            mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, null);
+            mbuttonClickedEventForShort.RemoveAllListeners();
+            mbuttonClickedEventForShort.AddListener(shortClickFunction);
         }
         public void SwitchModeToLongClick(float repeatPeriod, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.LongClick;
             mrepeatPeriod = repeatPeriod;
 
-            mfunctions = new Tuple<UnityAction, UnityAction>(null, longClickFunction);
+            mbuttonClickedEventForLong.RemoveAllListeners();
+            mbuttonClickedEventForLong.AddListener(longClickFunction);
         }
         public void SwitchModeToShortAndLongClick(float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortAndLongClick;
             mrepeatPeriod = repeatPeriod;
 
-            mfunctions = new Tuple<UnityAction, UnityAction>(shortClickFunction, longClickFunction);
+            mbuttonClickedEventForShort.RemoveAllListeners();
+            mbuttonClickedEventForLong.RemoveAllListeners();
+
+            mbuttonClickedEventForShort.AddListener(shortClickFunction);
+            mbuttonClickedEventForLong.AddListener(longClickFunction);
         }
         public void SetButtonAnimationState(string animationStateName, in EUIButtonAnimationKind buttonAnimationKind)
         {
