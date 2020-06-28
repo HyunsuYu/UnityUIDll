@@ -74,12 +74,10 @@ namespace UnityUIDll
 
         //  related with button GameObject Image Component
         private Image mbuttonImage;
-        [SerializeField]
         private Dictionary<EUIButtonSpriteKind, Sprite> mbuttonSpriteTable;
 
         //  related with button GameObject Animation
         private Animator mbuttonAnimator;
-        [SerializeField]
         private Dictionary<EUIButtonAnimationKind, string> mbuttonAnimationTable;
 
         //  button state bool variable
