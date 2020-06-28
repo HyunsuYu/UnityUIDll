@@ -391,6 +391,13 @@ namespace UnityUIDll
                 mbuttonAnimationTable.Add(buttonAnimationKind, animationStateName);
             }
         }
+        public void RemoveButtonAnimationState(in EUIButtonAnimationKind buttonAnimationKind)
+        {
+            if(mbuttonAnimationTable.ContainsKey(buttonAnimationKind))
+            {
+                mbuttonAnimationTable.Remove(buttonAnimationKind);
+            }
+        }
         public void SetButtonAnimationController(in RuntimeAnimatorController animatorController)
         {
             mbuttonAnimator.runtimeAnimatorController = animatorController;
@@ -405,6 +412,13 @@ namespace UnityUIDll
             else
             {
                 mbuttonSpriteTable.Add(buttonSpriteKind, sprite);
+            }
+        }
+        public void RemoveButtonSprite(in EUIButtonSpriteKind buttonSpriteKind)
+        {
+            if(mbuttonSpriteTable.ContainsKey(buttonSpriteKind))
+            {
+                mbuttonSpriteTable.Remove(buttonSpriteKind);
             }
         }
 
