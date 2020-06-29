@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -16,7 +15,20 @@ namespace UnityUIDll
     public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
         //  defines
-        public struct InputPack
+        public struct InputPack_Simple
+        {
+            public GameObject mtargetObject;
+
+            public Sprite mbaseSprite;
+
+            public InputPack_Simple(in GameObject targetObject, in Sprite PopedSprite)
+            {
+                mtargetObject = targetObject;
+
+                mbaseSprite = PopedSprite;
+            }
+        };
+        public struct InputPack_Detail
         {
             public GameObject mtargetObject;
 
@@ -26,7 +38,7 @@ namespace UnityUIDll
             public Vector2 mpivot;
             public Vector2 manchor;
 
-            public InputPack(in GameObject targetObject, in Sprite PopedSprite, in Vector2 position, in Vector2 pivot, in Vector2 anchor)
+            public InputPack_Detail(in GameObject targetObject, in Sprite PopedSprite, in Vector2 position, in Vector2 pivot, in Vector2 anchor)
             {
                 mtargetObject = targetObject;
 
@@ -59,12 +71,12 @@ namespace UnityUIDll
 
 
 
-        //  propertys
-        //  target GmaeObject
+        //  properties
+            //  target GmaeObject
         [SerializeField]
         private GameObject mtargetObject;
 
-        //  related with button
+            //  related with button
         private Button.ButtonClickedEvent mbuttonClickedEventForShort;
         private Button.ButtonClickedEvent mbuttonClickedEventForLong;
         private RectTransform mrectTransform;
@@ -72,27 +84,27 @@ namespace UnityUIDll
         private float mrepeatPeriod;
         private bool mbisPushed;
 
-        //  related with button GameObject Image Component
+            //  related with button GameObject Image Component
         private Image mbuttonImage;
         private Dictionary<EUIButtonSpriteKind, Sprite> mbuttonSpriteTable;
 
-        //  related with button GameObject Animation
+            //  related with button GameObject Animation
         private Animator mbuttonAnimator;
         private Dictionary<EUIButtonAnimationKind, string> mbuttonAnimationTable;
 
-        //  button state bool variable
+            //  button state bool variable
         private bool mbisEnter;
         private bool mbisClick;
         private bool mbisDown;
 
-        //  using default
+            //  using default
         private bool mbusingDefault;
 
 
 
         //  methods
-            //  constructor
-        public void ConstructDefault(in InputPack inputPack, in UnityAction shortClickFunction)
+        //  constructor
+        public void ConstructDefault(in InputPack_Simple inputPack, in UnityAction shortClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortClick;
 
@@ -100,11 +112,7 @@ namespace UnityUIDll
 
             mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
             mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
-            mrectTransform = mtargetObject.AddComponent<RectTransform>() as RectTransform;
-            mrectTransform.pivot = new Vector2(inputPack.mpivot.x, inputPack.mpivot.y);
-            mrectTransform.anchorMin = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
-            mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
-            mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
+            mrectTransform = mtargetObject.AddComponent<RectTransform>();
             mrepeatPeriod = -1.0f;
 
             mbuttonClickedEventForShort.AddListener(shortClickFunction);
@@ -120,7 +128,7 @@ namespace UnityUIDll
 
             usingDefault = true;
         }
-        public void ConstructDefault(in InputPack inputPack, float repeatPeriod, in UnityAction longClickFunction)
+        public void ConstructDefault(in InputPack_Simple inputPack, float repeatPeriod, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.LongClick;
 
@@ -128,12 +136,15 @@ namespace UnityUIDll
 
             mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
             mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
-            mrectTransform = mtargetObject.AddComponent<RectTransform>() as RectTransform;
-            mrectTransform.pivot = new Vector2(inputPack.mpivot.x, inputPack.mpivot.y);
-            mrectTransform.anchorMin = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
-            mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
-            mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
-            mrepeatPeriod = repeatPeriod;
+            mrectTransform = mtargetObject.AddComponent<RectTransform>();
+            if (repeatPeriod > 0.0f)
+            {
+                mrepeatPeriod = repeatPeriod;
+            }
+            else
+            {
+                mrepeatPeriod = 0.1f;
+            }
 
             mbuttonClickedEventForLong.AddListener(longClickFunction);
 
@@ -148,7 +159,7 @@ namespace UnityUIDll
 
             usingDefault = true;
         }
-        public void ConstructDefault(in InputPack inputPack, float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
+        public void ConstructDefault(in InputPack_Simple inputPack, float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortAndLongClick;
 
@@ -156,12 +167,114 @@ namespace UnityUIDll
 
             mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
             mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
-            mrectTransform = mtargetObject.AddComponent<RectTransform>() as RectTransform;
-            mrectTransform.pivot = new Vector2(inputPack.mpivot.x, inputPack.mpivot.y);
-            mrectTransform.anchorMin = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
-            mrectTransform.anchorMax = new Vector2(inputPack.manchor.x, inputPack.manchor.y);
-            mrectTransform.anchoredPosition = new Vector3(inputPack.mposition.x, inputPack.mposition.y, 0.0f);
-            mrepeatPeriod = repeatPeriod;
+            mrectTransform = mtargetObject.AddComponent<RectTransform>();
+            if (repeatPeriod > 0.0f)
+            {
+                mrepeatPeriod = repeatPeriod;
+            }
+            else
+            {
+                mrepeatPeriod = 0.1f;
+            }
+
+            mbuttonClickedEventForShort.AddListener(shortClickFunction);
+            mbuttonClickedEventForLong.AddListener(longClickFunction);
+
+            mbuttonImage = mtargetObject.AddComponent<Image>();
+            mbuttonImage.sprite = inputPack.mbaseSprite;
+            mbuttonSpriteTable = new Dictionary<EUIButtonSpriteKind, Sprite>();
+            mbuttonSpriteTable.Add(EUIButtonSpriteKind.Poped, inputPack.mbaseSprite);
+
+            mbuttonAnimator = mtargetObject.AddComponent<Animator>();
+            mbuttonAnimationTable = new Dictionary<EUIButtonAnimationKind, string>();
+            mbuttonAnimator.enabled = false;
+
+            usingDefault = true;
+        }
+        public void ConstructDefault(in InputPack_Detail inputPack, in UnityAction shortClickFunction)
+        {
+            mbuttonClickType = EButtonClickType.ShortClick;
+
+            mtargetObject = inputPack.mtargetObject;
+
+            mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
+            mrectTransform = mtargetObject.AddComponent<RectTransform>();
+            mrectTransform.pivot = inputPack.mpivot;
+            mrectTransform.anchorMin = inputPack.manchor;
+            mrectTransform.anchorMax = inputPack.manchor;
+            mrectTransform.anchoredPosition = inputPack.mposition;
+            mrepeatPeriod = -1.0f;
+
+            mbuttonClickedEventForShort.AddListener(shortClickFunction);
+
+            mbuttonImage = mtargetObject.AddComponent<Image>();
+            mbuttonImage.sprite = inputPack.mbaseSprite;
+            mbuttonSpriteTable = new Dictionary<EUIButtonSpriteKind, Sprite>();
+            mbuttonSpriteTable.Add(EUIButtonSpriteKind.Poped, inputPack.mbaseSprite);
+
+            mbuttonAnimator = mtargetObject.AddComponent<Animator>();
+            mbuttonAnimationTable = new Dictionary<EUIButtonAnimationKind, string>();
+            mbuttonAnimator.enabled = false;
+
+            usingDefault = true;
+        }
+        public void ConstructDefault(in InputPack_Detail inputPack, float repeatPeriod, in UnityAction longClickFunction)
+        {
+            mbuttonClickType = EButtonClickType.LongClick;
+
+            mtargetObject = inputPack.mtargetObject;
+
+            mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
+            mrectTransform = mtargetObject.AddComponent<RectTransform>();
+            mrectTransform.pivot = inputPack.mpivot;
+            mrectTransform.anchorMin = inputPack.manchor;
+            mrectTransform.anchorMax = inputPack.manchor;
+            mrectTransform.anchoredPosition = inputPack.mposition;
+            if (repeatPeriod > 0.0f)
+            {
+                mrepeatPeriod = repeatPeriod;
+            }
+            else
+            {
+                mrepeatPeriod = 0.1f;
+            }
+
+            mbuttonClickedEventForLong.AddListener(longClickFunction);
+
+            mbuttonImage = mtargetObject.AddComponent<Image>();
+            mbuttonImage.sprite = inputPack.mbaseSprite;
+            mbuttonSpriteTable = new Dictionary<EUIButtonSpriteKind, Sprite>();
+            mbuttonSpriteTable.Add(EUIButtonSpriteKind.Poped, inputPack.mbaseSprite);
+
+            mbuttonAnimator = mtargetObject.AddComponent<Animator>();
+            mbuttonAnimationTable = new Dictionary<EUIButtonAnimationKind, string>();
+            mbuttonAnimator.enabled = false;
+
+            usingDefault = true;
+        }
+        public void ConstructDefault(in InputPack_Detail inputPack, float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
+        {
+            mbuttonClickType = EButtonClickType.ShortAndLongClick;
+
+            mtargetObject = inputPack.mtargetObject;
+
+            mbuttonClickedEventForShort = new Button.ButtonClickedEvent();
+            mbuttonClickedEventForLong = new Button.ButtonClickedEvent();
+            mrectTransform = mtargetObject.AddComponent<RectTransform>();
+            mrectTransform.pivot = inputPack.mpivot;
+            mrectTransform.anchorMin = inputPack.manchor;
+            mrectTransform.anchorMax = inputPack.manchor;
+            mrectTransform.anchoredPosition = inputPack.mposition;
+            if (repeatPeriod > 0.0f)
+            {
+                mrepeatPeriod = repeatPeriod;
+            }
+            else
+            {
+                mrepeatPeriod = 0.1f;
+            }
 
             mbuttonClickedEventForShort.AddListener(shortClickFunction);
             mbuttonClickedEventForLong.AddListener(longClickFunction);
@@ -314,7 +427,7 @@ namespace UnityUIDll
         {
             get => mbisPushed;
         }
-        public Image buttonImage
+        public Image image
         {
             get => mbuttonImage;
         }
@@ -349,7 +462,7 @@ namespace UnityUIDll
             set => mbusingDefault = value;
         }
 
-            //  behavior method
+            //  behaviour method
         public void SwitchModeToShortClick(in UnityAction shortClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortClick;
@@ -361,7 +474,14 @@ namespace UnityUIDll
         public void SwitchModeToLongClick(float repeatPeriod, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.LongClick;
-            mrepeatPeriod = repeatPeriod;
+            if (repeatPeriod > 0.0f)
+            {
+                mrepeatPeriod = repeatPeriod;
+            }
+            else
+            {
+                mrepeatPeriod = 0.1f;
+            }
 
             mbuttonClickedEventForLong.RemoveAllListeners();
             mbuttonClickedEventForLong.AddListener(longClickFunction);
@@ -369,7 +489,14 @@ namespace UnityUIDll
         public void SwitchModeToShortAndLongClick(float repeatPeriod, in UnityAction shortClickFunction, in UnityAction longClickFunction)
         {
             mbuttonClickType = EButtonClickType.ShortAndLongClick;
-            mrepeatPeriod = repeatPeriod;
+            if (repeatPeriod > 0.0f)
+            {
+                mrepeatPeriod = repeatPeriod;
+            }
+            else
+            {
+                mrepeatPeriod = 0.1f;
+            }
 
             mbuttonClickedEventForShort.RemoveAllListeners();
             mbuttonClickedEventForLong.RemoveAllListeners();
