@@ -562,11 +562,25 @@ namespace UnityUIDll
 
             if (mbisPushed && mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPushed))
             {
-                mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPushed];
+                if(mbisEnter)
+                {
+                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPushed];
+                }
+                else
+                {
+                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Pushed];
+                }
             }
             else if (mbuttonSpriteTable.ContainsKey(EUIButtonSpriteKind.OnMouseOrTouchPoped))
             {
-                mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPoped];
+                if(mbisEnter)
+                {
+                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.OnMouseOrTouchPoped];
+                }
+                else
+                {
+                    mbuttonImage.sprite = mbuttonSpriteTable[EUIButtonSpriteKind.Poped];
+                }
             }
         }
     }
