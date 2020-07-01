@@ -69,7 +69,6 @@ namespace UnityUIDll
 
         //  properties
             //  target GmaeObject
-        [SerializeField]
         private GameObject mtargetObject;
 
             //  related with button
