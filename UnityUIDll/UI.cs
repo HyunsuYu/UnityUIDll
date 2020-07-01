@@ -7,10 +7,6 @@ using UnityEngine.UI;
 
 namespace UnityUIDll
 {
-    #region Defines
-
-    #endregion
-
     #region MainClases
     public class UIButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
