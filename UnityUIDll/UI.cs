@@ -421,16 +421,16 @@ namespace UnityUIDll
                         }
 
                         
-                        if (mbisPushed && mbuttonAnimationTable.ContainsKey(EUIButtonAnimationKind.ButtonPushed))
-                        {
-                            mbuttonAnimator.enabled = true;
-                            mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.ButtonPushed], 0, 0.0f);
-                            Invoke("SetAnimatorEnableFalse", mbuttonAnimator.runtimeAnimatorController.animationClips[0].length);
-                        }
-                        else if (mbuttonAnimationTable.ContainsKey(EUIButtonAnimationKind.Idle))
+                        if (mbisPushed && mbuttonAnimationTable.ContainsKey(EUIButtonAnimationKind.Idle))
                         {
                             mbuttonAnimator.enabled = true;
                             mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.Idle], 0, 0.0f);
+                            Invoke("SetAnimatorEnableFalse", mbuttonAnimator.runtimeAnimatorController.animationClips[0].length);
+                        }
+                        else if (mbuttonAnimationTable.ContainsKey(EUIButtonAnimationKind.ButtonPushed))
+                        {
+                            mbuttonAnimator.enabled = true;
+                            mbuttonAnimator.Play(mbuttonAnimationTable[EUIButtonAnimationKind.ButtonPushed], 0, 0.0f);
                             Invoke("SetAnimatorEnableFalse", mbuttonAnimator.runtimeAnimatorController.animationClips[1].length);
                         }
 
